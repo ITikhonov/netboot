@@ -3,7 +3,7 @@
   To build it: gcc -o netboot netboot.c
 
   netboot.c
-  Version 2008-05-02
+  Version 2009-12-02
 
   Copyright (C) 2007,2008 Ivan Tikhonov
 
@@ -87,6 +87,8 @@ void tftpd(int s) {
 						strcpy(p,"blksize"); p+=8; pp+=8;
 						blksize = atoi(pp);
 						strcpy(p,pp); p+=strlen(p)+1; pp+=strlen(pp)+1;
+					} else {
+						pp+=strlen(pp)+1; pp+=strlen(pp)+1;
 					}
 				}
 				sendto(s,o,p-o,0,(struct sockaddr *)&peer,peerl);
