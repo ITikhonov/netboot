@@ -1,11 +1,11 @@
-/* http://www.brokestream.com/wordpress/category/netboot/ 
+/* http://brokestream.com/netboot.html
 
   To build it: gcc -o netboot netboot.c
 
   netboot.c
-  Version 2009-12-02
+  Version 2010-01-19
 
-  Copyright (C) 2007,2008 Ivan Tikhonov
+  Copyright (C) 2007-2010 Ivan Tikhonov
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -41,6 +41,8 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <string.h>
+
+#include <stdint.h>
 
 void tftpd(int s) {
 	static int f;
@@ -191,6 +193,7 @@ int main(int argc, char *argv[]) {
 		if (nobody && nobody->pw_uid) setuid(nobody->pw_uid);
 	}
 
+
 	for(;;) {
 		fd_set rset;
 		int n;
@@ -235,8 +238,9 @@ int main(int argc, char *argv[]) {
 				int i,m;
 				p[0] = 2;
 				p[12] = 0; p[13] = 0; p[14] = 0; p[15] = 0;
-				p[16] = cc&0xff; p[17] = (cc>>8)&0xff; p[18] = (cc>>16)&0xff; p[19] = (cc>>24)&0xff;
-				p[20] = sc&0xff; p[21] = (sc>>8)&0xff; p[22] = (sc>>16)&0xff; p[23] = (sc>>24)&0xff;
+
+				*(uint32_t*)(p+16)=(uint32_t)cc;
+				*(uint32_t*)(p+20)=(uint32_t)sc;
 
 				i = 240;
 
@@ -256,7 +260,7 @@ int main(int argc, char *argv[]) {
 				p[i++] = 255; p[i++] = 255; p[i++] = 255; p[i++] = 255;
 
 				p[i++] = 54; p[i++] = 4;
-				p[i++] = sc&0xff; p[i++] = (sc>>8)&0xff; p[i++] = (sc>>16)&0xff; p[i++] = (sc>>24)&0xff;
+				*(uint32_t*)(p+i)=(uint32_t)sc; i+=4;
 
 				p[i++] = 60; p[i++] = 9;
 				p[i++] = 'P'; p[i++] = 'X'; p[i++] = 'E'; p[i++] = 'C'; p[i++] = 'l'; p[i++] = 'i'; p[i++] = 'e'; p[i++] = 'n'; p[i++] = 't';
@@ -277,7 +281,8 @@ int main(int argc, char *argv[]) {
 						p[i++] = 6; p[i++] = 1; p[i++] = 0;
 
 						p[i++] = 8; p[i++] = 7;
-						p[i++] = 0; p[i++] = 0; p[i++] = 1; p[i++] = sc&0xff; p[i++] = (sc>>8)&0xff; p[i++] = (sc>>16)&0xff; p[i++] = (sc>>24)&0xff;
+						p[i++] = 0; p[i++] = 0; p[i++] = 1;
+						*(uint32_t*)(p+i)=(uint32_t)sc; i+=4;
 					}
 					p[i++] = 255;
 				}
